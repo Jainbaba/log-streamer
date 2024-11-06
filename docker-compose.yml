@@ -1,0 +1,160 @@
+version: '3.8'
+
+services:
+  # Application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9092
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "8000:8000"  
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]  # Assuming your app has a health endpoint
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  # Redis service
+  redis:
+    image: "cgr.dev/chainguard/redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data  # Persist Redis data in production
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  # Zookeeper service (Kafka dependency)
+  zookeeper:
+    image: "cgr.dev/chainguard/zookeeper:latest"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    volumes:
+      - zookeeper_data:/data
+    ports:
+      - "2181:2181"
+    networks:
+      - app-network
+
+  # Kafka service
+  kafka:
+    image: "cgr.dev/chainguard/kafka:latest"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka_data:/kafka
+    depends_on:
+      - zookeeper
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "sh", "-c", "cd /dev && ls -l /proc/self/fd/1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+  # # Database Consumer service
+  # database_consumer:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.database_consumer
+  #   depends_on:
+  #     - app
+  #     - kafka
+  #     - redis
+  #     - listen_socket
+  #   environment:
+  #     - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+  #     - DJANGO_DEBUG=${DJANGO_DEBUG}
+  #   networks:
+  #     - app-network
+
+  # WebSocket Consumer service
+  websocket_consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.websocket_consumer
+    depends_on:
+      app:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - app-network
+
+  # Socket Listener service
+  listen_socket:
+    build:
+      context: .
+      dockerfile: Dockerfile.listen_socket
+    depends_on:
+      app:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - app-network
+  
+  nextjs:
+    build: 
+      context: ./logger-frontent
+      dockerfile: Dockerfile.nextjs
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      app:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+
+# Define a network for the services
+networks:
+  app-network:
+
+# Define volumes for persistent storage
+volumes:
+  redis_data:
+  zookeeper_data:
+  kafka_data:
