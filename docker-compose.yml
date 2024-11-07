@@ -133,7 +133,7 @@ services:
 
   nextjs:
     build: 
-      context: ./logger-frontend
+      context: ./logger-frontent
       dockerfile: Dockerfile.nextjs
     ports:
       - "3000:3000"
