@@ -113,13 +113,6 @@ CACHES = {
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 DATABASE_URL = config("DATABASE_URL", default=None)
 
 if DATABASE_URL is not None:
@@ -168,23 +161,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "/static/"
-STATICFILES_URL = BASE_DIR / "staticfiles"
-STATICFILES_URL.mkdir(exist_ok=True, parents=True)
-STATICFILES_VENDOR_URL = STATICFILES_URL / "vendors"
+# Add this setting to allow serving files in production
+WHITENOISE_USE_FINDERS = True
 
-# source(s) for python manage.py collectstatic
-STATICFILES_DIRS = [STATICFILES_URL]
+# Make sure these settings are correct
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
-
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-# local cdn
-STATIC_ROOT = BASE_DIR / "local-cdn"
+# Try this storage backend instead
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
