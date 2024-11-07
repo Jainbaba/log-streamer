@@ -50,10 +50,6 @@ ENV DJANGO_DEBUG=${DJANGO_DEBUG}
 
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
-
-ARG DJANGO_DEBUG=0
-ENV CONN_MAX_AGE=${CONN_MAX_AGE}
-
 # Copy the project code into the container's working directory
 COPY ./src /code
 
