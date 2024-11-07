@@ -25,10 +25,6 @@ RUN apt-get update && apt-get install -y \
     redis-server \
     gcc \
     netcat \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Kafka dependencies
-RUN apt-get update && apt-get install -y \
     librdkafka-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -45,7 +41,7 @@ COPY requirements.txt /tmp/requirements.txt
 ARG DJANGO_SECRET_KEY
 ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
 
-ARG DJANGO_DEBUG=0
+ARG DJANGO_DEBUG
 ENV DJANGO_DEBUG=${DJANGO_DEBUG}
 
 ARG DATABASE_URL
