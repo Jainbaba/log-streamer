@@ -1,5 +1,6 @@
 [build]
-builder = "DOCKER-COMPOSE"
+builder = "nixpacks"
+buildCommand = "docker-compose build"
 watchPatterns = [
     "requirements.txt", 
     "src/**", 
