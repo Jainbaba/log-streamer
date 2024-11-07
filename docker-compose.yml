@@ -130,10 +130,10 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     networks:
       - app-network
-  
+
   nextjs:
     build: 
-      context: ./logger-frontent
+      context: ./logger-frontend
       dockerfile: Dockerfile.nextjs
     ports:
       - "3000:3000"
@@ -148,7 +148,6 @@ services:
         condition: service_healthy
     networks:
       - app-network
-
 # Define a network for the services
 networks:
   app-network:
