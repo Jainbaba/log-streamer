@@ -1,0 +1,3 @@
+[submodule "logger-frontend"]
+	path = logger-frontend
+	url = https://github.com/Jainbaba/logger-frontent
