@@ -1,6 +1,5 @@
 [build]
 builder = "DOCKER-COMPOSE"
-dockerfilePath = "./docker-compose.yml"
 watchPatterns = [
     "requirements.txt", 
     "src/**", 
