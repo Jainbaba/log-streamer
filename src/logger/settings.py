@@ -62,7 +62,8 @@ MIDDLEWARE = [
 
 # Add CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Allow requests from Next.js development server
+    "http://localhost:3000",
+    "http://13.127.229.179:8000",
 ]
 
 # Optional: If you want to allow credentials (cookies, authorization headers)
