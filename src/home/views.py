@@ -18,11 +18,10 @@ class HistoricalLogsView(APIView):
     def get(self, request):
         start = request.query_params.get(
             "start"
-        )  # Optional timestamp to fetch older logs
+        )  
         limit = int(
             request.query_params.get("limit", 50)
-        )  # Fixed batch size for lazy loading
-
+        ) 
         try:
             if start:
                 start_datetime = datetime.fromtimestamp(float(start))
@@ -46,11 +45,11 @@ class HistoricalLogsView(APIView):
 class FilterTypeView(APIView):
     def get(self, request):
         try:
-            # Cache key and timeout
+            
             cache_key = "filter_type_data"
             cache_timeout = 60 
 
-            # Check if data is in the cache
+            
             cached_data = cache.get(cache_key)
             from_cache = False
 
@@ -91,9 +90,9 @@ class FilterTypeView(APIView):
 def health_check(request):
     db_conn_alive = True
     try:
-        # Check PostgreSQL connection
+        
         with connections['default'].cursor() as cursor:
-            cursor.execute("SELECT 1")  # Basic query for PostgreSQL
+            cursor.execute("SELECT 1")  
     except OperationalError:
         db_conn_alive = False
 

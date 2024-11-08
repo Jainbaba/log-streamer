@@ -17,7 +17,7 @@ class Command(BaseCommand):
         """Run the socket listener."""
         producer = self.create_kafka_producer() 
         try:
-            listen_socket(producer)  # Run the socket listener
+            listen_socket(producer)  
         finally:
-            producer.close()  # Ensure producer is stopped
+            producer.close() 
             logging.info("Kafka producer stopped.")

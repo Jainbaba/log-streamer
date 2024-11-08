@@ -27,9 +27,9 @@ class RequestMethod(models.Model):
 class LogEntry(models.Model):
     timestamp = models.CharField(max_length=30)
     date_time = models.DateTimeField()
-    level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name="log_entries_demo")  # ForeignKey to Level
-    request_method = models.ForeignKey(RequestMethod, on_delete=models.CASCADE, related_name="log_entries_demo")  # ForeignKey to RequestMethod
-    host = models.ForeignKey(Host, on_delete=models.CASCADE, related_name="log_entries_demo")  # ForeignKey to Host
+    level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name="log_entries_demo")  
+    request_method = models.ForeignKey(RequestMethod, on_delete=models.CASCADE, related_name="log_entries_demo") 
+    host = models.ForeignKey(Host, on_delete=models.CASCADE, related_name="log_entries_demo")  
     log_string = models.TextField()
     added_now = models.DateTimeField(auto_now_add=True)
 
