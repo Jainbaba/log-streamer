@@ -45,7 +45,7 @@ def extract_log_details(log_entry_str: str):
     timestamp_pattern = r"(\d{4}[-/]\d{2}[-/]\d{2} \d{2}:\d{2}:\d{2}(\.\d+)?)"
     level_pattern = r"\[(\w+)\]"  
     request_method_pattern = r"\"(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)"  
-    host_pattern = r"(\d+\.\d+\.\d+\.\d+)"  
+    host_pattern = r"([a-zA-Z0-9\-]+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+\.\d+|[a-zA-Z0-9\-\.]+:\d+|[a-zA-Z]+/\d+\.\d+\.\d+)"
 
     
     timestamp_match = re.search(timestamp_pattern, log_entry_str)
