@@ -63,7 +63,7 @@ class Command(BaseCommand):
                 log_entry = json.loads(
                     encoded_message
                 )
-                if len(log_entry["log_string"]) < 75:
+                if len(log_entry["log_string"]) < 300:
                     logging.info(f"Sending message to WebSocket: {log_entry}")
                     asyncio.run(self.send_message_to_websocket(log_entry))
                     self.save_log_entry(log_entry)
