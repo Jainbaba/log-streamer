@@ -176,6 +176,7 @@ services:
       - app-network
     volumes:
       - ./rsyslog.conf:/etc/rsyslog.conf
+      - ./logs:/var/log 
 
 # Define a network for the services
 networks:
