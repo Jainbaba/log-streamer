@@ -20,11 +20,11 @@ services:
       - DJANGO_DEBUG=${DJANGO_DEBUG}
       - DATABASE_URL=${DATABASE_URL}
     ports:
-      - "8000:8000"  
+      - "8000:8000"
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]  # Assuming your app has a health endpoint
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ] # Assuming your app has a health endpoint
       interval: 30s
       timeout: 10s
       retries: 5
@@ -34,11 +34,11 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data  # Persist Redis data in production
+      - redis_data:/data # Persist Redis data in production
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -72,11 +72,10 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "sh", "-c", "cd /dev && ls -l /proc/self/fd/1 || exit 1"]
+      test: [ "CMD", "sh", "-c", "cd /dev && ls -l /proc/self/fd/1 || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 5
-
 
   # # Database Consumer service
   # database_consumer:
@@ -133,7 +132,7 @@ services:
       - app-network
 
   nextjs:
-    build: 
+    build:
       context: ./logger-frontent
       dockerfile: Dockerfile.nextjs
     ports:
@@ -149,13 +148,13 @@ services:
         condition: service_healthy
     networks:
       - app-network
-  
+
   nginx:
     image: nginx:latest
     ports:
-      - "8080:80"  # Expose NGINX on port 8080
+      - "8080:80" # Expose NGINX on port 8080
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro  # Mount custom NGINX config file
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro # Mount custom NGINX config file
     depends_on:
       app:
         condition: service_healthy
@@ -168,7 +167,9 @@ services:
         max-file: "3"
 
   rsyslog:
-    image: rsyslog/rsyslog
+    build:
+      context: .
+      dockerfile: Dockerfile.rsyslog
     ports:
       - "514:514"
     networks:
@@ -180,7 +181,7 @@ services:
 networks:
   app-network:
 
-# Define volumes for persistent storage
+    # Define volumes for persistent storage
 volumes:
   redis_data:
   zookeeper_data:
