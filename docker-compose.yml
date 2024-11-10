@@ -170,7 +170,7 @@ services:
   rsyslog:
     image: rsyslog/rsyslog
     ports:
-      - "13.127.229.179:514"
+      - "514:514"
     networks:
       - app-network
     volumes:
