@@ -21,7 +21,7 @@ class Command(BaseCommand):
         """Setup the socket server"""
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind(('13.127.229.179', 9000))
+        self.sock.bind(('0.0.0.0', 9000))
         self.sock.listen(5)
         self.connectedSocket, address = self.sock.accept()
         logging.info("Socket connection established")
