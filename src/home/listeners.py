@@ -10,7 +10,7 @@ KAFKA_BROKER = 'kafka:9092'
 KAFKA_TOPIC = 'log_entries'
 
 def listen_socket(producer):
-    address = ('13.127.229.179', 8080)
+    address = ('13.127.229.179', 9000)
     try:
         logging.info("Attempting to connect to socket...")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
