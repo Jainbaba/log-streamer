@@ -10,7 +10,7 @@ KAFKA_BROKER = 'kafka:9092'
 KAFKA_TOPIC = 'log_entries'
 
 def listen_socket(producer):
-    address = ("13.127.229.179", 514)
+    address = ("0.0.0.0", 9999)
     try:
         logging.info("Attempting to connect to socket...")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,7 +20,7 @@ def listen_socket(producer):
         while True:
             try:
                 logging.info("Listening..")
-                data = sock.recv(9000)  
+                data = sock.recv(4096)  
                 if not data:
                     logging.warning("Connection closed by the server.")
                     break 

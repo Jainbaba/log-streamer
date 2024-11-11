@@ -28,11 +28,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-    logging:
-      driver: "syslog"
-      options:
-        syslog-address: "tcp://13.127.229.179:514"
-        tag: "app"
   # Redis service
   redis:
     image: "cgr.dev/chainguard/redis:latest"
@@ -82,21 +77,23 @@ services:
       timeout: 10s
       retries: 5
 
-  # # Database Consumer service
-  # database_consumer:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.database_consumer
-  #   depends_on:
-  #     - app
-  #     - kafka
-  #     - redis
-  #     - listen_socket
-  #   environment:
-  #     - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-  #     - DJANGO_DEBUG=${DJANGO_DEBUG}
-  #   networks:
-  #     - app-network
+  # fake_log
+  fake_log:
+    build:
+      context: .
+      dockerfile: Dockerfile.fake_log
+    depends_on:
+      app:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+    networks:
+      - app-network
 
   # WebSocket Consumer service
   websocket_consumer:
@@ -135,11 +132,6 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     networks:
       - app-network
-    logging:
-      driver: "syslog"
-      options:
-        syslog-address: "tcp://13.127.229.179:514"
-        tag: "app"
 
   nextjs:
     build:
@@ -158,40 +150,6 @@ services:
         condition: service_healthy
     networks:
       - app-network
-    logging:
-      driver: "syslog"
-      options:
-        syslog-address: "tcp://13.127.229.179:514"
-        tag: "app"
-
-  nginx:
-    image: nginx:latest
-    ports:
-      - "8080:80" # Expose NGINX on port 8080
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro # Mount custom NGINX config file
-    depends_on:
-      app:
-        condition: service_healthy
-    networks:
-      - app-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  rsyslog:
-    build:
-      context: .
-      dockerfile: Dockerfile.rsyslog
-    ports:
-      - "514:514"
-    networks:
-      - app-network
-    volumes:
-      - ./rsyslog.conf:/etc/rsyslog.conf
-      - ./logs:/var/log 
 
 # Define a network for the services
 networks:
