@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 COPY ./src /code/
 
 # Set the command to run the socket listener
-CMD ["python", "manage.py", "fake_log"]
+CMD ["python", "fake_log.py"]

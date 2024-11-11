@@ -82,24 +82,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.fake_log
-    depends_on:
-      app:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    environment:
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DJANGO_DEBUG=${DJANGO_DEBUG}
+    ports:
+      - "9000:9000"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "sh", "-c", "nc -z localhost 9000 && echo 'Health check passed, exiting.' && exit 0 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
   # WebSocket Consumer service
   websocket_consumer:
     build:
@@ -111,8 +97,6 @@ services:
       kafka:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      fake_log:
         condition: service_healthy
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
@@ -132,8 +116,6 @@ services:
       kafka:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      fake_log:
         condition: service_healthy
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}

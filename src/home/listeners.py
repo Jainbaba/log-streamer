@@ -1,6 +1,7 @@
 import logging
 import json
 import re
+import time
 from datetime import datetime,timezone
 import socket
 
@@ -10,42 +11,50 @@ KAFKA_BROKER = 'kafka:9092'
 KAFKA_TOPIC = 'log_entries'
 
 def listen_socket(producer):
-    address = ('0.0.0.0', 9000)
+    address = ('fake_log', 9000)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    # Retry loop to connect to the socket server
+    while True:
+        try:
+            logging.info("Attempting to connect to socket...")
+            sock.connect(address)
+            logging.info("Connected to Socket")
+            break
+        except socket.error as e:
+            logging.error(f"Connection error: {e}, retrying in 5 seconds...")
+            time.sleep(5)
+
     try:
-        logging.info("Attempting to connect to socket...")
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        logging.info(f"address: {address}")
-        sock.connect(address)
-        logging.info("Connected to Socket")
         while True:
             try:
-                logging.info("Listening..")
-                data = sock.recv(4096)  
+                logging.info("Listening...")
+                data = sock.recv(4096)
                 if not data:
                     logging.warning("Connection closed by the server.")
-                    break 
-                message = data.decode() 
-                log_entry = extract_log_details(message)  
+                    break
+                message = data.decode()
+                log_entry = extract_log_details(message)
                 if log_entry:
                     try:
-                        producer.send(KAFKA_TOPIC, json.dumps(log_entry).encode('utf-8'))  
-                        producer.flush() 
+                        producer.send(KAFKA_TOPIC, json.dumps(log_entry).encode('utf-8'))
+                        producer.flush()
                         logging.info(f"Message Pushed {log_entry}")
                     except Exception as e:
                         logging.error(f"Failed to send message to Kafka: {e}")
             except Exception as e:
                 logging.error(f"Error receiving message: {e}")
-    except Exception as e:
-        logging.error(f"Connection error: {e}")
     finally:
-        sock.close() 
+        sock.close()
         logging.info("Socket closed.")
 
 def extract_log_details(log_entry_str: str):
     timestamp_pattern = r"(\d{4}[-/]\d{2}[-/]\d{2} \d{2}:\d{2}:\d{2}(\.\d+)?)"
     level_pattern = r"\[(\w+)\]"  
-    request_method_pattern = r"\"(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)"  
-    host_pattern = r"([a-zA-Z0-9\-]+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+\.\d+|[a-zA-Z0-9\-\.]+:\d+|[a-zA-Z]+/\d+\.\d+\.\d+)"
+    request_method_pattern = r"(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)" 
+    host_pattern = r"\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b|(\[[a-fA-F0-9:]+\])|\b[\w.-]+\.[a-zA-Z]{2,}\b"
+
+
 
     
     timestamp_match = re.search(timestamp_pattern, log_entry_str)
