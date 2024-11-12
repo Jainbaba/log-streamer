@@ -8,6 +8,7 @@ from datetime import datetime
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+
 class FakeLogGenerator:
     def __init__(self):
         self.fake = Faker()
@@ -19,7 +20,7 @@ class FakeLogGenerator:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.sock.bind(('0.0.0.0', 9000))
+        self.sock.bind(("0.0.0.0", 9000))
         self.sock.listen(5)
         logging.info("Socket server started, waiting for connections...")
 
@@ -31,12 +32,10 @@ class FakeLogGenerator:
         log_entry = (
             f"{datetime.now().isoformat()} "
             f"[{self.fake.random_element(log_types)}] "
-            f"{self.fake.uuid4()} "
+            f"{self.fake.random_element(request_methods)} "
             f"{self.fake.ipv4()} "
             f"{self.fake.user_agent()} "
-            f"{self.fake.random_element(request_methods)} "
             f"{self.fake.sentence()} "
-            f"{self.fake.random_element([200, 201, 400, 401, 403, 404, 500])}"
         )
 
         return log_entry
@@ -64,12 +63,14 @@ class FakeLogGenerator:
                         self.connected_socket.sendall(f"{log_entry}\n".encode("utf-8"))
                         logging.info(f"Sent: {log_entry}")
                 except (socket.error, BrokenPipeError):
-                    logging.warning("Client disconnected, waiting for new connection...")
+                    logging.warning(
+                        "Client disconnected, waiting for new connection..."
+                    )
                     self.connected_socket.close()
                     self.connected_socket = None
 
                 # Random sleep before sending the next log
-                time.sleep(random.uniform(0.3, 1.0))
+                time.sleep(random.uniform(0.7, 1.0))
 
         except KeyboardInterrupt:
             logging.info("Stopping fake log generator")
@@ -78,6 +79,7 @@ class FakeLogGenerator:
                 self.connected_socket.close()
             if self.sock:
                 self.sock.close()
+
 
 if __name__ == "__main__":
     generator = FakeLogGenerator()
