@@ -124,23 +124,23 @@ services:
     networks:
       - app-network
 
-  nextjs:
-    build:
-      context: ./logger-frontent
-      dockerfile: Dockerfile.nextjs
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      app:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - app-network
+  # nextjs:
+  #   build:
+  #     context: ./logger-frontent
+  #     dockerfile: Dockerfile.nextjs
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=production
+  #   depends_on:
+  #     app:
+  #       condition: service_healthy
+  #     kafka:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
 
 # Define a network for the services
 networks:

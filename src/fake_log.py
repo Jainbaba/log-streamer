@@ -70,7 +70,7 @@ class FakeLogGenerator:
                     self.connected_socket = None
 
                 # Random sleep before sending the next log
-                time.sleep(random.uniform(0.7, 1.0))
+                time.sleep(random.uniform(5, 8))
 
         except KeyboardInterrupt:
             logging.info("Stopping fake log generator")
